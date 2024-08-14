@@ -3,13 +3,13 @@ A dns probing tool which shows your DNS resolver IPs and latancy.
 
 It can also test if your browser supports HTTP3 and show your IP addresses.
 
-See the scheme image below for technical details.
+See the architecture image below for technical details.
 
 # Demo
 See the demo here: [https://probe.xxyy.app/](https://probe.xxyy.app/)
 
-# Scheme
-![The scheme image](scheme.jpg)
+# Architecture
+![The architecture image](scheme.jpg)
 
 ```
 T1 - T0 =  HTTP_Downward_Time + Browser_DNS_Delay
