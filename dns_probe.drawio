@@ -1,0 +1,133 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15" version="24.7.7">
+  <diagram name="第 1 页" id="DJJXC9AKWuyp5_yreATE">
+    <mxGraphModel dx="1194" dy="697" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="idgThhZkejP6E5jO7zT1-2" value="&lt;h4&gt;Browser&lt;/h4&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="50" y="320" width="110" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="idgThhZkejP6E5jO7zT1-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;dashed=1;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="670" y="472" as="sourcePoint" />
+            <mxPoint x="780" y="472" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="690" y="472" />
+              <mxPoint x="690" y="472" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="idgThhZkejP6E5jO7zT1-20" value="Notify T1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="idgThhZkejP6E5jO7zT1-19" vertex="1" connectable="0">
+          <mxGeometry x="-0.0909" y="1" relative="1" as="geometry">
+            <mxPoint y="-16" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="idgThhZkejP6E5jO7zT1-4" value="&lt;h4&gt;Resolver&lt;/h4&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="550" y="320" width="120" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="idgThhZkejP6E5jO7zT1-5" value="&lt;h4&gt;Backend&lt;/h4&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="780" y="320" width="120" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="idgThhZkejP6E5jO7zT1-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="160" y="535" as="sourcePoint" />
+            <mxPoint x="780" y="535" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="630" y="535" />
+              <mxPoint x="630" y="535" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="idgThhZkejP6E5jO7zT1-22" value="HTTP GET&amp;nbsp;&lt;br&gt;abc.probe.xxyy.app" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="idgThhZkejP6E5jO7zT1-21" vertex="1" connectable="0">
+          <mxGeometry x="-0.6063" y="1" relative="1" as="geometry">
+            <mxPoint x="-42" y="-20" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="idgThhZkejP6E5jO7zT1-23" value="Mark T2" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="idgThhZkejP6E5jO7zT1-21" vertex="1" connectable="0">
+          <mxGeometry x="0.8194" y="1" relative="1" as="geometry">
+            <mxPoint x="-4" y="-14" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="idgThhZkejP6E5jO7zT1-24" value="probe.xxyy.app&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;*.probe.xxyy.app" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="580" y="490" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="idgThhZkejP6E5jO7zT1-25" value="T1 - T0 = &amp;nbsp;HTTP_Downward_Time +&amp;nbsp;Browser_DNS_Delay&lt;br&gt;&lt;br&gt;T2 - T1 = &amp;nbsp;DNS_Downward_Time +&amp;nbsp;HTTP_Upward_Time&amp;nbsp;&lt;br&gt;&amp;nbsp;&lt;br&gt;T3 - T2 = &amp;nbsp;HTTP_Downward_Time&amp;nbsp;+&amp;nbsp;HTTP_Upward_Time&lt;br&gt;&lt;br&gt;Where&lt;br&gt;&lt;br&gt;Browser_DNS_Delay is the time between browser starts loading and DNS resolver receives request.&lt;br&gt;&lt;br&gt;DNS_Downward_Time is the time between DNS resolver responds and Browser gets the response.&lt;br&gt;&lt;br&gt;Both account for DNS overhead.&lt;br&gt;&lt;br&gt;&lt;br&gt;Browser_DNS_Delay +&amp;nbsp;DNS_Downward_Time = (T2 - T0) - (T3 - T2)&lt;br&gt;&lt;br&gt;if assume&amp;nbsp;HTTP_Downward_Time =&amp;nbsp;HTTP_Upward_Time, then&lt;br&gt;&lt;br&gt;&amp;nbsp;&amp;nbsp;Browser_DNS_Delay = ( T1 - T0) - (T3 - T2)/2&lt;br&gt;&lt;br&gt;&amp;nbsp;&amp;nbsp;DNS_Downward_Time&amp;nbsp;= ( T2 - T1) - (T3 - T2)/2" style="text;strokeColor=none;align=center;fillColor=#CCCCCC;html=1;verticalAlign=middle;rounded=0;labelBackgroundColor=none;fillStyle=auto;" parent="1" vertex="1">
+          <mxGeometry x="180" y="680" width="610" height="420" as="geometry" />
+        </mxCell>
+        <mxCell id="idgThhZkejP6E5jO7zT1-26" value="&amp;amp;&lt;br&gt;HTTP Server" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="795" y="490" width="90" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="idgThhZkejP6E5jO7zT1-30" value="HTTP Server&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;*.probe.xxyy.app" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="350" y="490" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="idgThhZkejP6E5jO7zT1-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="160" y="470" as="sourcePoint" />
+            <mxPoint x="550" y="470" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="450" y="470" />
+              <mxPoint x="450" y="470" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="idgThhZkejP6E5jO7zT1-13" value="Resolve DNS of&lt;br&gt;*.probe.xxyy.app" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="idgThhZkejP6E5jO7zT1-12" vertex="1" connectable="0">
+          <mxGeometry x="-0.4974" y="2" relative="1" as="geometry">
+            <mxPoint x="82" y="-18" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="idgThhZkejP6E5jO7zT1-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="160" y="596" as="sourcePoint" />
+            <mxPoint x="780" y="595" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="310" y="596" />
+              <mxPoint x="310" y="596" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="idgThhZkejP6E5jO7zT1-33" value="HTTP GET&amp;nbsp;&lt;br&gt;abc.probe.xxyy.app/?t=t1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="1" vertex="1" connectable="0">
+          <mxGeometry x="240" y="533" as="geometry">
+            <mxPoint x="-3" y="39" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="idgThhZkejP6E5jO7zT1-34" value="Mark T3" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="1" vertex="1" connectable="0">
+          <mxGeometry x="720" y="543" as="geometry">
+            <mxPoint x="-1" y="36" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="idgThhZkejP6E5jO7zT1-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="161" y="349" as="sourcePoint" />
+            <mxPoint x="779" y="349" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="201" y="349" />
+              <mxPoint x="201" y="349" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="idgThhZkejP6E5jO7zT1-15" value="HTTP GET&lt;br&gt;probe.xxyy.app" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="idgThhZkejP6E5jO7zT1-11" vertex="1" connectable="0">
+          <mxGeometry x="-0.4625" y="1" relative="1" as="geometry">
+            <mxPoint x="37" y="-19" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="idgThhZkejP6E5jO7zT1-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="778" y="407" as="sourcePoint" />
+            <mxPoint x="161" y="407" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="160" y="407" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="idgThhZkejP6E5jO7zT1-10" value="HTML &amp;amp; Javascript" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="idgThhZkejP6E5jO7zT1-9" vertex="1" connectable="0">
+          <mxGeometry x="-0.1333" y="-1" relative="1" as="geometry">
+            <mxPoint x="-48" y="-14" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TVQrkxT1JQ82To1WuINA-1" value="Mark T0" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="720" y="385" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

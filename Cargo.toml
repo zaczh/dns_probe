@@ -1,0 +1,42 @@
+[package]
+name = "dns_probe"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+hickory-proto = "0.24.0"
+byteorder = "1"
+log = { version = "0.4", features = ["std"] }
+lazy_static = "1"
+rand = "0.8.5"
+env_logger = "0.9"
+hyper-rustls = "0.26.0"
+rustls = { version = "0.23", features = ["logging", "ring", "std"] }
+hyper = { version = "1.4.1", features = ["full"] }
+tokio = { version = "1", features = ["full"] }
+http-body-util = "0.1"
+hyper-util = { version = "0.1", features = ["full"] }
+tokio-rustls = "0.25.0"
+rustls-pemfile = "2.0.0"
+http = "1"
+pki-types = { package = "rustls-pki-types", version = "1" }
+ring = "0.17"
+quinn = "0.11.2"
+quinn-proto = "0.11.3"
+h3 = "0.0.6"
+h3-quinn = "0.0.7"
+flate2 = "1"
+bytes = "1.6.1"
+clap = { version = "4.5.15", features = ["derive"] }
+
+[[bin]]
+name = "dns_probe_resolver"
+path = "src/resolver/main.rs"
+
+[[bin]]
+name = "dns_probe_frontend"
+path = "src/frontend/main.rs"
+
+[lib]
+name = "dns_probe_lib"
+path = "src/common/lib.rs"
