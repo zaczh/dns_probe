@@ -1,5 +1,5 @@
 # A DNS probing Tool
-A dns probing tool which shows your DNS resolver IPs and latancies.
+A dns probing tool which shows your DNS resolver IPs and latancy.
 
 It can also test if your browser supports HTTP3 and shows your IP address.
 
