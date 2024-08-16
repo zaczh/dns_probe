@@ -685,6 +685,10 @@ fn notify_id_gen_t0(totp: String) {
 fn homepage_handler_main(socket: SocketAddr, req: Request<()>) -> Response<Vec<u8>> {
     let args = Cli::parse();
     let domain = args.domain;
+    let mut site_root = args.site_root_dir;
+    while site_root.ends_with("/") {
+        site_root.pop();
+    }
     let h1_host = req.headers().get("host").map(|s| s.to_str().unwrap());
     let h2_host = req.uri().host();
     let host = h2_host.or(h1_host);
@@ -734,8 +738,7 @@ fn homepage_handler_main(socket: SocketAddr, req: Request<()>) -> Response<Vec<u
         }
 
         // resource request
-        let request_file_path =
-            concat!(env!("CARGO_MANIFEST_DIR"), "/src/frontend/www").to_string() + path;
+        let request_file_path = site_root + path;
         let f_opt = File::open(request_file_path);
         if f_opt.is_err() {
             error!(
