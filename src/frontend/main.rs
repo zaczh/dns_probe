@@ -96,7 +96,7 @@ lazy_static::lazy_static! {
     };
     static ref ASN_HANDLE: ASNs = {
         let asn_file_path = Cli::parse().asn_file_path;
-        let _ = File::open(&asn_file_path).expect("The asn file does not exist: {asn_file_path}");
+        let _ = File::open(&asn_file_path).expect(&format!("The asn file does not exist: {asn_file_path}"));
         let asn = ASNs::new(&asn_file_path).unwrap();
         asn
     };
