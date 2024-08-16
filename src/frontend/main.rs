@@ -248,11 +248,7 @@ async fn dns_notify_handler_main() {
     use hickory_proto::op::message;
     use tokio::net::UdpSocket;
     let args = Cli::parse();
-    let domain = if args.domain.ends_with(".") {
-        args.domain
-    } else {
-        args.domain + "."
-    };
+    let domain = args.domain;
     let addr = args.listen;
 
     let server_socket = UdpSocket::bind(addr)
@@ -295,15 +291,16 @@ async fn dns_notify_handler_main() {
         let dns_message_query_name = dns_message_query.name();
         let dns_message_query_name_string = dns_message_query_name.to_string().to_lowercase();
 
-        if dns_message_query_name_string == "ip.v4.".to_string() + domain.as_str()
-            || dns_message_query_name_string == "ip.v6.".to_string() + domain.as_str()
+        if dns_message_query_name_string == "ip.v4.".to_string() + domain.as_str() + "."
+            || dns_message_query_name_string == "ip.v6.".to_string() + domain.as_str() + "."
         {
             continue;
         }
 
-        if !dns_message_query_name_string.ends_with((".v4.".to_string() + domain.as_str()).as_str())
+        if !dns_message_query_name_string
+            .ends_with((".v4.".to_string() + domain.as_str() + ".").as_str())
             && !dns_message_query_name_string
-                .ends_with((".v6.".to_string() + domain.as_str()).as_str())
+                .ends_with((".v6.".to_string() + domain.as_str() + ".").as_str())
         {
             continue;
         }
@@ -417,11 +414,7 @@ async fn dns_notify_handler_main() {
 
 fn ip_dns_check_handler_main(addr: SocketAddr, req: Request<()>) -> Response<Vec<u8>> {
     let args = Cli::parse();
-    let domain = if args.domain.ends_with(".") {
-        args.domain
-    } else {
-        args.domain + "."
-    };
+    let domain = args.domain;
     let mut response: Response<Vec<u8>> = http::Response::builder()
         .status(StatusCode::OK)
         .body(Vec::new())
@@ -466,9 +459,8 @@ fn ip_dns_check_handler_main(addr: SocketAddr, req: Request<()>) -> Response<Vec
     }
 
     let host_without_colon = host.split(':').next().unwrap().to_lowercase();
-    let value = host_without_colon + ".";
-    let components: Vec<&str> = value.split('.').collect();
-    if !value.ends_with(domain.as_str()) || components.len() <= 2 {
+    let components: Vec<&str> = host_without_colon.split('.').collect();
+    if !host_without_colon.ends_with(domain.as_str()) || components.len() <= 2 {
         error!(
             "bad request, method: {}, host: {}, path: {}, ip: {}",
             method,
@@ -679,11 +671,7 @@ fn notify_id_gen_t0(totp: String) {
 
 fn homepage_handler_main(socket: SocketAddr, req: Request<()>) -> Response<Vec<u8>> {
     let args = Cli::parse();
-    let domain = if args.domain.ends_with(".") {
-        args.domain
-    } else {
-        args.domain + "."
-    };
+    let domain = args.domain;
     let h1_host = req.headers().get("host").map(|s| s.to_str().unwrap());
     let h2_host = req.uri().host();
     let host = h2_host.or(h1_host);
@@ -708,7 +696,7 @@ fn homepage_handler_main(socket: SocketAddr, req: Request<()>) -> Response<Vec<u
 
     let host = host.unwrap();
     let host_without_colon = host.split(':').next().unwrap().to_lowercase();
-    if domain != host_without_colon + "." {
+    if domain != host_without_colon {
         error!(
             "unknown host, method: {}, host: {}, path: {}, ip: {}",
             method,
