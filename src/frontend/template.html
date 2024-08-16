@@ -227,41 +227,41 @@
             }
 
             function do_dns_request(url1, url2, on_finish) {
-                var req_dns_v4 = new XMLHttpRequest();
-                req_dns_v4.timeout = 10000;
-                req_dns_v4.addEventListener("load", function (r) {
-                    if (req_dns_v4.status != 200) {
+                var req_dns1 = new XMLHttpRequest();
+                req_dns1.timeout = 10000;
+                req_dns1.addEventListener("load", function (r) {
+                    if (req_dns1.status != 200) {
                         on_finish(-1);
                         return;
                     }
 
-                    var req_dns_v4_2 = new XMLHttpRequest();
-                    req_dns_v4_2.timeout = 10000;
-                    req_dns_v4_2.addEventListener("load", function (r) {
-                        if (req_dns_v4_2.status != 200) {
+                    var req_dns2 = new XMLHttpRequest();
+                    req_dns2.timeout = 10000;
+                    req_dns2.addEventListener("load", function (r) {
+                        if (req_dns2.status != 200) {
                             on_finish(-1);
                             return;
                         }
 
                         on_finish(0);
                     });
-                    req_dns_v4_2.addEventListener("error", function (r) {
+                    req_dns2.addEventListener("error", function (r) {
                         on_finish(-1);
                     });
-                    req_dns_v4_2.addEventListener("timeout", function (r) {
+                    req_dns2.addEventListener("timeout", function (r) {
                         on_finish(-1);
                     });
-                    req_dns_v4_2.open("GET", url2);
-                    req_dns_v4_2.send();
+                    req_dns2.open("GET", url2);
+                    req_dns2.send();
                 });
-                req_dns_v4.addEventListener("error", function (r) {
+                req_dns1.addEventListener("error", function (r) {
                     on_finish(-1);
                 });
-                req_dns_v4.addEventListener("timeout", function (r) {
+                req_dns1.addEventListener("timeout", function (r) {
                     on_finish(-1);
                 });
-                req_dns_v4.open("GET", url1);
-                req_dns_v4.send();
+                req_dns1.open("GET", url1);
+                req_dns1.send();
             }
 
             get_ip_info();
