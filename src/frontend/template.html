@@ -231,7 +231,7 @@
                 req_dns_v4.timeout = 10000;
                 req_dns_v4.addEventListener("load", function (r) {
                     if (req_dns_v4.status != 200) {
-                        on_finish("");
+                        on_finish(-1);
                         return;
                     }
 
@@ -239,26 +239,26 @@
                     req_dns_v4_2.timeout = 10000;
                     req_dns_v4_2.addEventListener("load", function (r) {
                         if (req_dns_v4_2.status != 200) {
-                            on_finish("");
+                            on_finish(-1);
                             return;
                         }
 
-                        on_finish("OK");
+                        on_finish(0);
                     });
                     req_dns_v4_2.addEventListener("error", function (r) {
-                        on_finish("");
+                        on_finish(-1);
                     });
                     req_dns_v4_2.addEventListener("timeout", function (r) {
-                        on_finish("");
+                        on_finish(-1);
                     });
                     req_dns_v4_2.open("GET", url2);
                     req_dns_v4_2.send();
                 });
                 req_dns_v4.addEventListener("error", function (r) {
-                    on_finish("");
+                    on_finish(-1);
                 });
                 req_dns_v4.addEventListener("timeout", function (r) {
-                    on_finish("");
+                    on_finish(-1);
                 });
                 req_dns_v4.open("GET", url1);
                 req_dns_v4.send();
@@ -269,7 +269,7 @@
                 "https://${1}.v4.probe.xxyy.app:8444/?t=t0",
                 "https://${1}.v4.probe.xxyy.app:8443/?t=t1",
                 function (d) {
-                    if (d != "OK") {
+                    if (d != 0) {
                         return;
                     }
                     check_dns_finished(
@@ -281,7 +281,7 @@
                 "https://${1}.v6.probe.xxyy.app:8444/?t=t0",
                 "https://${1}.v6.probe.xxyy.app:8443/?t=t1",
                 function (d) {
-                    if (d != "OK") {
+                    if (d != 0) {
                         return;
                     }
                     check_dns_finished(
