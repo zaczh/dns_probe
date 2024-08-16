@@ -37,6 +37,10 @@ struct Cli {
     #[arg(short, long)]
     asn_file_path: String,
 
+    /// The root dir for the main page which contains site favicon files, robots.txt, etc.
+    #[arg(short, long)]
+    site_root_dir: String,
+
     /// The https certificate of the main domain
     #[arg(long)]
     main_cert_path: String,
