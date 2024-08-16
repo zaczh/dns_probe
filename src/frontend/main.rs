@@ -419,9 +419,11 @@ fn ip_dns_check_handler_main(addr: SocketAddr, req: Request<()>) -> Response<Vec
         .status(StatusCode::OK)
         .body(Vec::new())
         .unwrap();
+
+    // Only allow requests from within the main page
     response.headers_mut().insert(
         http::header::ACCESS_CONTROL_ALLOW_ORIGIN,
-        HeaderValue::from_static("https://probe.xxyy.app"),
+        HeaderValue::from_str(format!("https://{domain}").as_str()).unwrap(),
     );
     response.headers_mut().insert(
         http::header::CACHE_CONTROL,
