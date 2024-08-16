@@ -28,9 +28,14 @@ struct Cli {
     /// The domain name for the main website
     #[arg(short, long)]
     domain: String,
+
     /// The socket address which this backend listening on
     #[arg(short, long)]
     listen: String,
+
+    /// The asn file path (e.g. ip2asn-combined.tsv.gz)
+    #[arg(short, long)]
+    asn_file_path: String,
 
     /// The https certificate of the main domain
     #[arg(long)]
@@ -89,10 +94,7 @@ lazy_static::lazy_static! {
         )).to_string();
         str
     };
-    static ref ASN_HANDLE: ASNs = ASNs::new(concat!(
-        env!("CARGO_MANIFEST_DIR"),
-        "/src/frontend/ip2asn-combined.tsv.gz"
-    )).unwrap();
+    static ref ASN_HANDLE: ASNs = ASNs::new(Cli::parse().asn_file_path.as_str()).unwrap();
 }
 
 #[tokio::main]
