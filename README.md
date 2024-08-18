@@ -8,7 +8,7 @@ See the architecture image below for technical details.
 # Deploy
 To deploy this project, you need to:
 1) Register a domain;
-2) Run `dns_probe_frontend` on a server machine, serving the website and listening for DNS probing requests;
+2) Run `dns_probe_frontend` on a server, serving the website and listening for DNS probing requests;
 3) Setup your own authoritative DNS servers for your domain. Change your DNS servers' binding port to some port other than 53(553 for example). Run the `dns_probe_resolver` tool, which will forward requests to your real DNS servers, and send probe to your `dns_probe_frontend` server;
 
 # Demo
