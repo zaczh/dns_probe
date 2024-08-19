@@ -18,6 +18,7 @@ To deploy this project, you need to:
    1) `probe.example.com`: This is your main domain. Setup correct IPv4/IPv6/HTTPS records for it.
    2) `*.v4.probe.example.com`: This is your IPv4 probing domain. Only setup IPv4 records for it. Do not setup IPv6 address for it.
    3) `*.v6.probe.example.com`: This is your IPv6 probing domain. Only setup IPv6 records for it. Do not setup IPv4 address for it.
+   All these domains should resolve to the IPv4 or IPv6 addresses of your `dns_probe_frontend` server. 
 
 # Demo
 See the demo here: [https://probe.xxyy.app/](https://probe.xxyy.app/)
