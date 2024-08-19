@@ -148,10 +148,15 @@ impl HttpServer {
                         Ok(conn) => {
                             info!("new connection established");
                             let remote_address = conn.remote_address();
-                            let mut h3_conn: h3::server::Connection<h3_quinn::Connection, Bytes> =
+                            let h3_conn_opt =
                                 h3::server::Connection::new(h3_quinn::Connection::new(conn))
-                                    .await
-                                    .unwrap();
+                                    .await;
+                            if h3_conn_opt.is_err() {
+                                error!("new connection failed from: {}, error: {}", remote_address, h3_conn_opt.err().unwrap());
+                                return;
+                            }
+
+                            let mut h3_conn: h3::server::Connection<h3_quinn::Connection, Bytes> = h3_conn_opt.unwrap();
 
                             loop {
                                 match h3_conn.accept().await {
