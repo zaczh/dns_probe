@@ -266,26 +266,26 @@
 
             get_ip_info();
             do_dns_request(
-                "https://${1}.v4.probe.xxyy.app:8444/?t=t0",
-                "https://${1}.v4.probe.xxyy.app:8443/?t=t1",
+                "https://${1}.v4.probe.xxyy.app:8444/?t=t2",
+                "https://${1}.v4.probe.xxyy.app:8443/?t=t3",
                 function (d) {
                     if (d != 0) {
                         return;
                     }
                     check_dns_finished(
-                        "https://${1}.v4.probe.xxyy.app:8443/?t=t2",
+                        "https://${1}.v4.probe.xxyy.app:8443/?t=t4",
                     );
                 },
             );
             do_dns_request(
-                "https://${1}.v6.probe.xxyy.app:8444/?t=t0",
-                "https://${1}.v6.probe.xxyy.app:8443/?t=t1",
+                "https://${1}.v6.probe.xxyy.app:8444/?t=t2",
+                "https://${1}.v6.probe.xxyy.app:8443/?t=t3",
                 function (d) {
                     if (d != 0) {
                         return;
                     }
                     check_dns_finished(
-                        "https://${1}.v6.probe.xxyy.app:8443/?t=t2",
+                        "https://${1}.v6.probe.xxyy.app:8443/?t=t4",
                     );
                 },
             );

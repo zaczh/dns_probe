@@ -547,7 +547,7 @@ fn ip_dns_check_handler_main(addr: SocketAddr, req: Request<()>) -> Response<Vec
     // dns probing request
     let values = values_opt.unwrap();
     let is_result_request = if let Some(query) = query_opt {
-        query.contains("t=t2")
+        query.contains("t=t4")
     } else {
         false
     };
