@@ -690,15 +690,10 @@ fn notify_id_gen_t0(totp: String, is_ipv6: bool) {
         let values: HashSet<ProbeItem> = HashSet::new();
         hashmap.insert(totp, (TimingInfo::new(t0, 0, 0, 0), values));
     }
-    let now = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .expect("wrong time")
-        .as_millis();
 
     let mut removed: Vec<String> = Vec::new();
     for (k, val) in hashmap.iter() {
-        if val.0.t0 > 0
-            && (now - val.0.t0) / 1000 > dns_probe_lib::PROBE_DNS_REQUEST_TIMEOUT as u128
+        if val.0.t0 > 0 && (t0 - val.0.t0) / 1000 > dns_probe_lib::PROBE_DNS_REQUEST_TIMEOUT as u128
         {
             removed.push(k.clone());
         }
