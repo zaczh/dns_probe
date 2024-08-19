@@ -278,14 +278,14 @@
                 },
             );
             do_dns_request(
-                "https://${1}.v6.probe.xxyy.app:8444/?t=t2",
-                "https://${1}.v6.probe.xxyy.app:8443/?t=t3",
+                "https://${2}.v6.probe.xxyy.app:8444/?t=t2",
+                "https://${2}.v6.probe.xxyy.app:8443/?t=t3",
                 function (d) {
                     if (d != 0) {
                         return;
                     }
                     check_dns_finished(
-                        "https://${1}.v6.probe.xxyy.app:8443/?t=t4",
+                        "https://${2}.v6.probe.xxyy.app:8443/?t=t4",
                     );
                 },
             );

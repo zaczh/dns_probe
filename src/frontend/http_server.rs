@@ -199,7 +199,7 @@ impl HttpServer {
 
                                             // Gracefully terminate the stream
                                             info!("http3 connection complete");
-                                            stream.finish().await.unwrap();
+                                            let _ = stream.finish().await;
                                         });
                                     }
 

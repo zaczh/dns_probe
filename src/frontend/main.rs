@@ -89,8 +89,21 @@ struct ProbeItem {
     edns_subnet_prefix_length: u8,
 }
 
+impl Clone for ProbeItem {
+    fn clone(&self) -> Self {
+        return ProbeItem {
+            remote_address: self.remote_address.clone(),
+            is_tcp_request: self.is_tcp_request,
+            edns_subnet_enabled: self.edns_subnet_enabled,
+            edns_subnet: self.edns_subnet.clone(),
+            edns_subnet_prefix_length: self.edns_subnet_prefix_length,
+        };
+    }
+}
+
 lazy_static::lazy_static! {
-    static ref CACHED_PROBE_ITEMS: Mutex<HashMap<String, (TimingInfo,TimingInfo, HashSet<ProbeItem>)>> = Mutex::new(HashMap::new());
+    static ref CACHED_PROBE_ITEMS_V4: Mutex<HashMap<String, (TimingInfo, HashSet<ProbeItem>)>> = Mutex::new(HashMap::new());
+    static ref CACHED_PROBE_ITEMS_V6: Mutex<HashMap<String, (TimingInfo, HashSet<ProbeItem>)>> = Mutex::new(HashMap::new());
     static ref HTML_TEMPLATE: String = {
         let str = include_str!(concat!(
         env!("CARGO_MANIFEST_DIR"),
@@ -325,19 +338,18 @@ async fn dns_notify_handler_main() {
         let totp = components[0];
         let is_v4 = components[1] == "v4";
         {
-            let mut hashmap = CACHED_PROBE_ITEMS.lock().unwrap();
+            let mut hashmap = if is_v4 {
+                CACHED_PROBE_ITEMS_V4.lock().unwrap()
+            } else {
+                CACHED_PROBE_ITEMS_V6.lock().unwrap()
+            };
             if let Some(item) = hashmap.get_mut(totp) {
-                let timing_info_v4 = &mut item.0;
-                let timing_info_v6 = &mut item.1;
+                let timing_info = &mut item.0;
                 let t1 = SystemTime::now()
                     .duration_since(UNIX_EPOCH)
                     .expect("wrong time")
                     .as_millis();
-                if is_v4 {
-                    timing_info_v4.t1 = t1;
-                } else {
-                    timing_info_v6.t1 = t1;
-                }
+                timing_info.t1 = t1;
                 is_verified_request = true;
             }
         }
@@ -366,56 +378,55 @@ async fn dns_notify_handler_main() {
         if let Some(extensions) = &dns_message.extensions() {
             if let Some(subnet) = extensions.option(hickory_proto::rr::rdata::opt::EdnsCode::Subnet)
             {
-                match subnet {
-                    hickory_proto::rr::rdata::opt::EdnsOption::Subnet(edns) => {
-                        let vec = edns.to_bytes().unwrap();
-                        let mut subnet_vec = vec.as_slice();
-                        let subnet_option_family = subnet_vec.read_u16::<BigEndian>().unwrap();
-                        let subnet_option_source_prefix_length = subnet_vec.read_u8().unwrap();
-                        let subnet_option_source_prefix_length_ceiled =
-                            ((subnet_option_source_prefix_length as f32) / 8.0).ceil();
-                        let _ = subnet_vec.read_u8().unwrap();
+                if let hickory_proto::rr::rdata::opt::EdnsOption::Subnet(edns) = subnet {
+                    let vec = edns.to_bytes().unwrap();
+                    let mut subnet_vec = vec.as_slice();
+                    let subnet_option_family = subnet_vec.read_u16::<BigEndian>().unwrap();
+                    let subnet_option_source_prefix_length = subnet_vec.read_u8().unwrap();
+                    let subnet_option_source_prefix_length_ceiled =
+                        ((subnet_option_source_prefix_length as f32) / 8.0).ceil();
+                    let _ = subnet_vec.read_u8().unwrap();
 
-                        if subnet_option_family == 1 {
-                            let mut ipv4_addr_vec = [0; 4];
-                            ipv4_addr_vec[..subnet_option_source_prefix_length_ceiled as usize]
-                                .clone_from_slice(
-                                    &vec[4..4 + subnet_option_source_prefix_length_ceiled as usize],
-                                );
-                            let ipv4_address = Ipv4Addr::from(ipv4_addr_vec);
-                            probe_item.edns_subnet_prefix_length =
-                                subnet_option_source_prefix_length;
-                            probe_item.edns_subnet_enabled = true;
-                            probe_item.edns_subnet = ipv4_address.to_string();
-                        } else if subnet_option_family == 2 {
-                            let mut ipv6_addr_vec = [0; 16];
+                    if subnet_option_family == 1 {
+                        let mut ipv4_addr_vec = [0; 4];
+                        ipv4_addr_vec[..subnet_option_source_prefix_length_ceiled as usize]
+                            .clone_from_slice(
+                                &vec[4..4 + subnet_option_source_prefix_length_ceiled as usize],
+                            );
+                        let ipv4_address = Ipv4Addr::from(ipv4_addr_vec);
+                        probe_item.edns_subnet_prefix_length = subnet_option_source_prefix_length;
+                        probe_item.edns_subnet_enabled = true;
+                        probe_item.edns_subnet = ipv4_address.to_string();
+                    } else if subnet_option_family == 2 {
+                        let mut ipv6_addr_vec = [0; 16];
 
-                            ipv6_addr_vec[..subnet_option_source_prefix_length_ceiled as usize]
-                                .clone_from_slice(
-                                    &vec[4..4 + subnet_option_source_prefix_length_ceiled as usize],
-                                );
-                            let ipv6_address = Ipv6Addr::from(ipv6_addr_vec);
-                            probe_item.edns_subnet_prefix_length =
-                                subnet_option_source_prefix_length;
-                            probe_item.edns_subnet_enabled = true;
-                            probe_item.edns_subnet = ipv6_address.to_string();
-                        } else {
-                            error!("unknown subnet_option_family: {}", subnet_option_family)
-                        }
+                        ipv6_addr_vec[..subnet_option_source_prefix_length_ceiled as usize]
+                            .clone_from_slice(
+                                &vec[4..4 + subnet_option_source_prefix_length_ceiled as usize],
+                            );
+                        let ipv6_address = Ipv6Addr::from(ipv6_addr_vec);
+                        probe_item.edns_subnet_prefix_length = subnet_option_source_prefix_length;
+                        probe_item.edns_subnet_enabled = true;
+                        probe_item.edns_subnet = ipv6_address.to_string();
+                    } else {
+                        error!("unknown subnet_option_family: {}", subnet_option_family)
                     }
-                    _ => {}
                 }
             }
         }
+        let totp = dns_message_query_name_string
+            .split('.')
+            .next()
+            .unwrap()
+            .to_string();
         {
-            let totp = dns_message_query_name_string
-                .split('.')
-                .next()
-                .unwrap()
-                .to_string();
-            let mut hashmap = CACHED_PROBE_ITEMS.lock().unwrap();
+            let mut hashmap = if is_v4 {
+                CACHED_PROBE_ITEMS_V4.lock().unwrap()
+            } else {
+                CACHED_PROBE_ITEMS_V6.lock().unwrap()
+            };
             if let Some(values) = hashmap.get_mut(&totp) {
-                values.2.insert(probe_item);
+                values.1.insert(probe_item.clone());
             } else {
                 error!("unknown dns query: {}", dns_message_query_name_string)
             }
@@ -490,7 +501,11 @@ fn ip_dns_check_handler_main(addr: SocketAddr, req: Request<()>) -> Response<Vec
 
     let totp = components[0];
     let is_v4 = components[1] == "v4";
-    let mut hashmap = CACHED_PROBE_ITEMS.lock().unwrap();
+    let mut hashmap = if is_v4 {
+        CACHED_PROBE_ITEMS_V4.lock().unwrap()
+    } else {
+        CACHED_PROBE_ITEMS_V6.lock().unwrap()
+    };
     let values_opt = hashmap.get_mut(totp);
     if !is_ip_checking_request && values_opt.is_none() {
         info!(
@@ -560,7 +575,7 @@ fn ip_dns_check_handler_main(addr: SocketAddr, req: Request<()>) -> Response<Vec
         },
     );
 
-    let timing_info = if is_v4 { &mut values.0 } else { &mut values.1 };
+    let timing_info = &mut values.0;
     let mut wait_for_t3 = false;
 
     let t = SystemTime::now()
@@ -590,15 +605,35 @@ fn ip_dns_check_handler_main(addr: SocketAddr, req: Request<()>) -> Response<Vec
         timing_info.t1,
         timing_info.t2,
         timing_info.t3,
-        values.2.len()
+        values.1.len()
     );
 
     let mut dns_response: String = "".to_string();
-    let values = &values.2;
+    let mut values = values.1.clone();
+
+    // Also add the probe items of another internet protocol
+    let values_alternate = if is_v4 {
+        let hashmap = CACHED_PROBE_ITEMS_V6.lock().unwrap();
+        if let Some(values_opt) = hashmap.get(totp) {
+            values_opt.1.clone()
+        } else {
+            HashSet::new()
+        }
+    } else {
+        let hashmap = CACHED_PROBE_ITEMS_V4.lock().unwrap();
+        if let Some(values_opt) = hashmap.get(totp) {
+            values_opt.1.clone()
+        } else {
+            HashSet::new()
+        }
+    };
+    for v in values_alternate {
+        values.insert(v);
+    }
     dns_response += "{";
     dns_response += format!("\"latency\": {}, \"resolvers\": ", dns_resolve_latency).as_str();
     dns_response += "[";
-    for value in values {
+    for value in &values {
         let ip: IpAddr = value.remote_address.parse().unwrap();
         if let Some(asn) = ASN_HANDLE.lookup_by_ip(ip) {
             dns_response += format!("{{\"resolver_ip\": \"{}\", \"asn\": {{\"number\": \"{}\", \"country\": \"{}\", \"description\": \"{}\"}}, \"edns_enabled\": {}, \"is_tcp_request\": {}, \"edns_subnet\": \"{}/{}\"}},",
@@ -637,10 +672,13 @@ fn ip_dns_check_handler_main(addr: SocketAddr, req: Request<()>) -> Response<Vec
     response
 }
 
-fn notify_id_gen_t0(totp: String) {
+fn notify_id_gen_t0(totp: String, is_ipv6: bool) {
     debug!("id gen received: {}", totp);
-    let mut hashmap = CACHED_PROBE_ITEMS.lock().unwrap();
-
+    let mut hashmap = if is_ipv6 {
+        CACHED_PROBE_ITEMS_V6.lock().unwrap()
+    } else {
+        CACHED_PROBE_ITEMS_V4.lock().unwrap()
+    };
     let t0 = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .expect("wrong time")
@@ -648,17 +686,9 @@ fn notify_id_gen_t0(totp: String) {
 
     if let Some(item) = hashmap.get_mut(&totp) {
         item.0.t0 = t0;
-        item.1.t0 = t0;
     } else {
         let values: HashSet<ProbeItem> = HashSet::new();
-        hashmap.insert(
-            totp,
-            (
-                TimingInfo::new(t0, 0, 0, 0),
-                TimingInfo::new(t0, 0, 0, 0),
-                values,
-            ),
-        );
+        hashmap.insert(totp, (TimingInfo::new(t0, 0, 0, 0), values));
     }
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -805,7 +835,9 @@ fn homepage_handler_main(socket: SocketAddr, req: Request<()>) -> Response<Vec<u
     );
 
     // Write the response
-    let totp = dns_probe_lib::generate_rand_str();
+    let totp_v4 = dns_probe_lib::generate_rand_str();
+    // To get full dns resolver ip list, we use the same key here.
+    let totp_v6 = totp_v4.clone();
 
     let body: String = HTML_TEMPLATE
         .replace(
@@ -823,11 +855,13 @@ fn homepage_handler_main(socket: SocketAddr, req: Request<()>) -> Response<Vec<u
             )
             .as_str(),
         )
-        .replace("${1}", totp.as_str());
+        .replace("${1}", totp_v4.as_str())
+        .replace("${2}", totp_v6.as_str());
     let mut body_bytes = Vec::from(body);
     resp.body_mut().append(&mut body_bytes);
 
-    notify_id_gen_t0(totp);
+    notify_id_gen_t0(totp_v4, false);
+    notify_id_gen_t0(totp_v6, true);
 
     resp
 }
