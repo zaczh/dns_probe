@@ -1,4 +1,10 @@
 # Changelog
+## v0.1.2 (8/19/2024)
+
+### Fixed
+
+- Crash of the http3 server.
+
 ## v0.1.1 (8/19/2024)
 
 ### Changed
