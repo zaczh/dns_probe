@@ -23,6 +23,12 @@ To deploy this project, you need to:
 See the demo here: [https://probe.xxyy.app/](https://probe.xxyy.app/)
 
 # Architecture
+The simplified process is as follows:
+1) Your browser navigates to `probe.example.com`. The server sends back HTML files and javascript, which includes additional wildcard domain requests.
+2) Your stub DNS resolver sends DNS requests to the authoritative DNS server of `example.com`.
+3) The authoritative DNS server of `example.com` answers your question and at the same time sends probing info to the `dns_probe_frontend` server.
+4) Your browser sends requests to the wildcard domain `*.v4.probe.example.com` to get the probing info and then display it.
+
 ![The architecture image](scheme.jpg)
 
 ```
