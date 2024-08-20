@@ -187,6 +187,7 @@
                     dns_list.forEach(function (dns) {
                         var new_dns_node = dns_node.cloneNode(true);
                         new_dns_node.removeAttribute("id");
+                        new_dns_node.removeAttribute("style");
                         new_dns_node.setAttribute("class", "resolver");
                         var ip = dns["resolver_ip"];
                         if (resolver_ip_list.includes(ip)) {
