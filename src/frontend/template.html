@@ -119,7 +119,7 @@
                 });
                 req_addr_v4.open(
                     "GET",
-                    "https://ip.v4.probe.xxyy.app:8444/?type=json",
+                    "https://ip.v4.${domain}:8444/?type=json",
                 );
                 req_addr_v4.send();
 
@@ -158,7 +158,7 @@
                 });
                 req_addr_v6.open(
                     "GET",
-                    "https://ip.v6.probe.xxyy.app:8444/?type=json",
+                    "https://ip.v6.${domain}:8444/?type=json",
                 );
                 req_addr_v6.send();
             }
@@ -274,27 +274,23 @@
 
             get_ip_info();
             do_dns_request(
-                "https://${1}.v4.probe.xxyy.app:8444/?t=t2",
-                "https://${1}.v4.probe.xxyy.app:8443/?t=t3",
+                "https://${1}.v4.${domain}:8444/?t=t2",
+                "https://${1}.v4.${domain}:8443/?t=t3",
                 function (d) {
                     if (d != 0) {
                         return;
                     }
-                    check_dns_finished(
-                        "https://${1}.v4.probe.xxyy.app:8443/?t=t4",
-                    );
+                    check_dns_finished("https://${1}.v4.${domain}:8443/?t=t4");
                 },
             );
             do_dns_request(
-                "https://${2}.v6.probe.xxyy.app:8444/?t=t2",
-                "https://${2}.v6.probe.xxyy.app:8443/?t=t3",
+                "https://${2}.v6.${domain}:8444/?t=t2",
+                "https://${2}.v6.${domain}:8443/?t=t3",
                 function (d) {
                     if (d != 0) {
                         return;
                     }
-                    check_dns_finished(
-                        "https://${2}.v6.probe.xxyy.app:8443/?t=t4",
-                    );
+                    check_dns_finished("https://${2}.v6.${domain}:8443/?t=t4");
                 },
             );
         </script>

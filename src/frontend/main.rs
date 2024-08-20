@@ -852,6 +852,7 @@ fn homepage_handler_main(socket: SocketAddr, req: Request<()>) -> Response<Vec<u
             )
             .as_str(),
         )
+        .replace("${domain}", &domain)
         .replace("${1}", totp_v4.as_str())
         .replace("${2}", totp_v6.as_str());
     let mut body_bytes = Vec::from(body);
