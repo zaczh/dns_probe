@@ -611,7 +611,8 @@ fn ip_dns_check_handler_main(addr: SocketAddr, req: Request<()>) -> Response<Vec
     let mut dns_response: String = "".to_string();
     let mut values = values.1.clone();
 
-    // Also add the probe items of another internet protocol
+    // Also add the probe items of another internet protocol.
+    // When items added, remove them from set to avoid duplicate items displayed.
     if is_v4 {
         let mut hashmap = CACHED_PROBE_ITEMS_V6.lock().unwrap();
         if let Some(values_opt) = hashmap.get_mut(totp) {
