@@ -426,7 +426,7 @@ async fn dns_notify_handler_main() {
                 CACHED_PROBE_ITEMS_V6.lock().unwrap()
             };
             if let Some(values) = hashmap.get_mut(&totp) {
-                values.1.insert(probe_item.clone());
+                values.1.insert(probe_item);
             } else {
                 error!("unknown dns query: {}", dns_message_query_name_string)
             }

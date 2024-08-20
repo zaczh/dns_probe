@@ -75,7 +75,9 @@
                 <span class="additional"></span>
                 <span class="additional"></span>
             </li>
-            <li id="dns-latency">DNS Latency: <span>0</span>ms</li>
+            <li id="dns-latency">
+                DNS Latency: <span style="display: none"></span>
+            </li>
             <li>${0}</li>
         </ul>
         <script type="text/javascript">
@@ -180,6 +182,7 @@
                     var dns_node = document.getElementById("dns");
                     var latency_element =
                         document.getElementById("dns-latency");
+                    var latency_span = latency_element.children[0];
                     var insert_pos = dns_node.nextSibling;
                     dns_list.forEach(function (dns) {
                         var new_dns_node = dns_node.cloneNode(true);
@@ -223,15 +226,10 @@
                         index++;
                     });
                     dns_node.setAttribute("style", "display: none;");
-                    var latency = parseInt(
-                        latency_element.children[0].textContent,
-                    );
-                    if (latency == 0) {
-                        latency = parseInt(dns_data["latency"]);
-                    } else {
-                        latency = (latency + parseInt(dns_data["latency"])) / 2;
+                    if (latency_span.textContent == "") {
+                        latency_span.textContent = dns_data["latency"] + "ms";
+                        latency_span.removeAttribute("style");
                     }
-                    latency_element.children[0].textContent = latency;
                 });
                 req_check_dns_result.open("GET", url);
                 req_check_dns_result.send();
