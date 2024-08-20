@@ -175,7 +175,8 @@
                         req_check_dns_result.responseText,
                     );
                     var dns_list = dns_data["resolvers"];
-                    var index = 1;
+                    var index =
+                        document.getElementsByClassName("resolver").length + 1;
                     var dns_node = document.getElementById("dns");
                     var latency_element =
                         document.getElementById("dns-latency");
@@ -183,6 +184,7 @@
                     dns_list.forEach(function (dns) {
                         var new_dns_node = dns_node.cloneNode(true);
                         new_dns_node.removeAttribute("id");
+                        new_dns_node.setAttribute("class", "resolver");
                         var ip = dns["resolver_ip"];
                         new_dns_node.children[0].textContent =
                             "DNS" + index + ": ";
