@@ -183,7 +183,6 @@
                     var latency_element =
                         document.getElementById("dns-latency");
                     var latency_span = latency_element.children[0];
-                    var insert_pos = dns_node.nextSibling;
                     dns_list.forEach(function (dns) {
                         var new_dns_node = dns_node.cloneNode(true);
                         new_dns_node.removeAttribute("id");
