@@ -75,7 +75,7 @@
                 <span class="additional"></span>
                 <span class="additional"></span>
             </li>
-            <li id="dns-latency">DNS Latency:</li>
+            <li id="dns-latency">DNS Latency:<span>0</span>ms</li>
             <li>${0}</li>
         </ul>
         <script type="text/javascript">
@@ -161,13 +161,8 @@
                 req_addr_v6.send();
             }
 
-            var req_check_dns_result = null;
             function check_dns_finished(url) {
-                if (req_check_dns_result) {
-                    return;
-                }
-
-                req_check_dns_result = new XMLHttpRequest();
+                var req_check_dns_result = new XMLHttpRequest();
                 req_check_dns_result.addEventListener("load", function (r) {
                     if (
                         req_check_dns_result.status != 200 ||
@@ -182,25 +177,28 @@
                     var dns_list = dns_data["resolvers"];
                     var index = 1;
                     var dns_node = document.getElementById("dns");
+                    var latency_element =
+                        document.getElementById("dns-latency");
                     var insert_pos = dns_node.nextSibling;
                     dns_list.forEach(function (dns) {
-                        var newSpan = dns_node.cloneNode(true);
-                        newSpan.removeAttribute("id");
+                        var new_dns_node = dns_node.cloneNode(true);
+                        new_dns_node.removeAttribute("id");
                         var ip = dns["resolver_ip"];
-                        newSpan.children[0].textContent = "DNS" + index + ": ";
+                        new_dns_node.children[0].textContent =
+                            "DNS" + index + ": ";
                         if (ip.indexOf(":") != -1) {
-                            newSpan.children[1].innerHTML =
+                            new_dns_node.children[1].innerHTML =
                                 '<span class="ipv6">' + ip + "</span>";
                         } else {
-                            newSpan.children[1].innerHTML =
+                            new_dns_node.children[1].innerHTML =
                                 '<span class="ipv4">' + ip + "</span>";
                         }
-                        newSpan.children[1].setAttribute(
+                        new_dns_node.children[1].setAttribute(
                             "href",
                             "https://bgp.tools/prefix/" + ip,
                         );
                         if (dns["asn"] != null) {
-                            newSpan.children[2].textContent =
+                            new_dns_node.children[2].textContent =
                                 "AS: " +
                                 dns["asn"]["number"] +
                                 ", " +
@@ -209,18 +207,29 @@
                                 dns["asn"]["country"];
                         }
                         if (dns["edns_enabled"]) {
-                            newSpan.children[3].textContent =
+                            new_dns_node.children[3].textContent =
                                 "ECS: " + dns["edns_subnet"];
                         }
                         if (dns["is_tcp_request"]) {
-                            newSpan.children[4].textContent = "TCP Request";
+                            new_dns_node.children[4].textContent =
+                                "TCP Request";
                         }
-                        dns_node.parentNode.insertBefore(newSpan, insert_pos);
+                        dns_node.parentNode.insertBefore(
+                            new_dns_node,
+                            insert_pos,
+                        );
                         index++;
                     });
                     dns_node.setAttribute("style", "display: none;");
-                    document.getElementById("dns-latency").innerHTML =
-                        "DNS Latency: " + dns_data["latency"] + "ms";
+                    var latency = parseInt(
+                        latency_element.children[0].textContent,
+                    );
+                    if (latency == 0) {
+                        latency = parseInt(dns_data["latency"]);
+                    } else {
+                        latency = (latency + parseInt(dns_data["latency"])) / 2;
+                    }
+                    latency_element.children[0].textContent = latency;
                 });
                 req_check_dns_result.open("GET", url);
                 req_check_dns_result.send();

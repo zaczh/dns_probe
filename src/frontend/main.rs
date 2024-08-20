@@ -612,24 +612,25 @@ fn ip_dns_check_handler_main(addr: SocketAddr, req: Request<()>) -> Response<Vec
     let mut values = values.1.clone();
 
     // Also add the probe items of another internet protocol
-    let values_alternate = if is_v4 {
-        let hashmap = CACHED_PROBE_ITEMS_V6.lock().unwrap();
-        if let Some(values_opt) = hashmap.get(totp) {
-            values_opt.1.clone()
-        } else {
-            HashSet::new()
+    if is_v4 {
+        let mut hashmap = CACHED_PROBE_ITEMS_V6.lock().unwrap();
+        if let Some(values_opt) = hashmap.get_mut(totp) {
+            let set = values_opt.1.clone();
+            for v in set {
+                values.insert(v);
+            }
+            values_opt.1.clear();
         }
     } else {
-        let hashmap = CACHED_PROBE_ITEMS_V4.lock().unwrap();
-        if let Some(values_opt) = hashmap.get(totp) {
-            values_opt.1.clone()
-        } else {
-            HashSet::new()
+        let mut hashmap = CACHED_PROBE_ITEMS_V4.lock().unwrap();
+        if let Some(values_opt) = hashmap.get_mut(totp) {
+            let set = values_opt.1.clone();
+            for v in set {
+                values.insert(v);
+            }
+            values_opt.1.clear();
         }
     };
-    for v in values_alternate {
-        values.insert(v);
-    }
     dns_response += "{";
     dns_response += format!("\"latency\": {}, \"resolvers\": ", dns_resolve_latency).as_str();
     dns_response += "[";
