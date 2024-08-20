@@ -163,6 +163,7 @@
                 req_addr_v6.send();
             }
 
+            var resolver_ip_list = [];
             function check_dns_finished(url) {
                 var req_check_dns_result = new XMLHttpRequest();
                 req_check_dns_result.addEventListener("load", function (r) {
@@ -188,6 +189,10 @@
                         new_dns_node.removeAttribute("id");
                         new_dns_node.setAttribute("class", "resolver");
                         var ip = dns["resolver_ip"];
+                        if (resolver_ip_list.includes(ip)) {
+                            return;
+                        }
+                        resolver_ip_list.push(ip);
                         new_dns_node.children[0].textContent =
                             "DNS" + index + ": ";
                         if (ip.indexOf(":") != -1) {
