@@ -240,7 +240,7 @@
                 req_check_dns_result.send();
             }
 
-            function do_dns_request(url1, url2, on_finish) {
+            function do_dns_request(url1, on_finish) {
                 var req_dns1 = new XMLHttpRequest();
                 req_dns1.timeout = 10000;
                 req_dns1.addEventListener("load", function (r) {
@@ -248,25 +248,7 @@
                         on_finish(-1);
                         return;
                     }
-
-                    var req_dns2 = new XMLHttpRequest();
-                    req_dns2.timeout = 10000;
-                    req_dns2.addEventListener("load", function (r) {
-                        if (req_dns2.status != 200) {
-                            on_finish(-1);
-                            return;
-                        }
-
-                        on_finish(0);
-                    });
-                    req_dns2.addEventListener("error", function (r) {
-                        on_finish(-1);
-                    });
-                    req_dns2.addEventListener("timeout", function (r) {
-                        on_finish(-1);
-                    });
-                    req_dns2.open("GET", url2);
-                    req_dns2.send();
+                    on_finish(0);
                 });
                 req_dns1.addEventListener("error", function (r) {
                     on_finish(-1);
@@ -281,7 +263,6 @@
             get_ip_info();
             do_dns_request(
                 "https://${1}.v4.${domain}:8444/?t=t2",
-                "https://${1}.v4.${domain}:8443/?t=t3",
                 function (d) {
                     if (d != 0) {
                         return;
@@ -291,7 +272,6 @@
             );
             do_dns_request(
                 "https://${2}.v6.${domain}:8444/?t=t2",
-                "https://${2}.v6.${domain}:8443/?t=t3",
                 function (d) {
                     if (d != 0) {
                         return;
