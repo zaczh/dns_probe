@@ -592,16 +592,6 @@ fn ip_dns_check_handler_main(addr: SocketAddr, req: Request<()>) -> Response<Vec
     }
 
     if !is_result_request {
-        let ip_type_str = components[1];
-        let new_url = format!("https://{totp}.{ip_type_str}.{domain}:8443/?t=t3");
-        let response_str = format!("Redirecting to: {new_url}");
-        let mut body_bytes = Vec::from(response_str);
-        response.headers_mut().insert(
-            http::header::LOCATION,
-            HeaderValue::from_str(&new_url).unwrap(),
-        );
-        *response.status_mut() = StatusCode::PERMANENT_REDIRECT;
-        response.body_mut().append(&mut body_bytes);
         return response;
     }
 
