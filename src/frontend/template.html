@@ -28,8 +28,23 @@
             }
 
             body {
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+                margin: 0;
                 font-family: Arial, sans-serif;
                 font-size: 19px;
+            }
+
+            main {
+                flex: 1;
+            }
+
+            footer {
+                text-align: end;
+                padding: 10px;
+                position: relative;
+                bottom: 0;
             }
 
             span.ipv6 {
@@ -66,246 +81,279 @@
     </head>
 
     <body>
-        <ul>
-            <li>IPv4: <a id="ipv4"></a><span class="additional"></span></li>
-            <li>IPv6: <a id="ipv6"></a><span class="additional"></span></li>
-            <li id="dns">
-                <span>DNS: </span><a href=""></a>
-                <span class="additional"></span>
-                <span class="additional"></span>
-                <span class="additional"></span>
-            </li>
-            <li id="dns-latency">
-                DNS Latency: <span style="display: none"></span>
-            </li>
-            <li>${0}</li>
-        </ul>
-        <script type="text/javascript">
-            "use strict";
-            (function () {
-                function get_ip_info() {
-                    var req_addr_v4 = new XMLHttpRequest();
-                    req_addr_v4.timeout = 10000;
-                    req_addr_v4.addEventListener("load", function (r) {
-                        if (req_addr_v4.status == 200) {
-                            var dns_data = JSON.parse(req_addr_v4.responseText);
-                            var ipv4_addr = dns_data["ip"];
-                            document
-                                .getElementById("ipv4")
-                                .setAttribute(
-                                    "href",
-                                    "https://bgp.tools/prefix/" + ipv4_addr,
+        <main>
+            <ul>
+                <li>IPv4: <a id="ipv4"></a><span class="additional"></span></li>
+                <li>IPv6: <a id="ipv6"></a><span class="additional"></span></li>
+                <li id="dns">
+                    <span>DNS: </span><a href=""></a>
+                    <span class="additional"></span>
+                    <span class="additional"></span>
+                    <span class="additional"></span>
+                </li>
+                <li id="dns-latency">
+                    DNS Latency: <span style="display: none"></span>
+                </li>
+                <li>${0}</li>
+            </ul>
+            <script type="text/javascript">
+                "use strict";
+                (function () {
+                    function get_ip_info() {
+                        var req_addr_v4 = new XMLHttpRequest();
+                        req_addr_v4.timeout = 10000;
+                        req_addr_v4.addEventListener("load", function (r) {
+                            if (req_addr_v4.status == 200) {
+                                var dns_data = JSON.parse(
+                                    req_addr_v4.responseText,
                                 );
-                            document.getElementById("ipv4").innerHTML =
-                                '<span class="ipv4">' + ipv4_addr + "</span>";
-                            document.getElementById(
-                                "ipv4",
-                            ).nextSibling.textContent =
-                                "AS: " +
-                                dns_data["number"] +
-                                ", " +
-                                dns_data["description"] +
-                                ", " +
-                                dns_data["country"];
-                        } else {
-                            document.getElementById("ipv4").innerHTML = "None";
-                        }
-                    });
-                    req_addr_v4.addEventListener("error", function (r) {
-                        document.getElementById("ipv4").innerHTML = "None";
-                    });
-                    req_addr_v4.addEventListener("timeout", function (r) {
-                        document.getElementById("ipv4").innerHTML = "None";
-                    });
-                    req_addr_v4.open(
-                        "GET",
-                        "https://ip.v4.${domain}:8444/?type=json",
-                    );
-                    req_addr_v4.send();
-
-                    var req_addr_v6 = new XMLHttpRequest();
-                    req_addr_v6.timeout = 10000;
-                    req_addr_v6.addEventListener("load", function (r) {
-                        if (req_addr_v6.status == 200) {
-                            var dns_data = JSON.parse(req_addr_v6.responseText);
-                            var ipv6_addr = dns_data["ip"];
-                            document
-                                .getElementById("ipv6")
-                                .setAttribute(
-                                    "href",
-                                    "https://bgp.tools/prefix/" + ipv6_addr,
-                                );
-                            document.getElementById("ipv6").innerHTML =
-                                '<span class="ipv6">' + ipv6_addr + "</span>";
-                            document.getElementById(
-                                "ipv6",
-                            ).nextSibling.textContent =
-                                "AS: " +
-                                dns_data["number"] +
-                                ", " +
-                                dns_data["description"] +
-                                ", " +
-                                dns_data["country"];
-                        } else {
-                            document.getElementById("ipv6").innerHTML = "None";
-                        }
-                    });
-                    req_addr_v6.addEventListener("error", function (r) {
-                        document.getElementById("ipv6").innerHTML = "None";
-                    });
-                    req_addr_v6.addEventListener("timeout", function (r) {
-                        document.getElementById("ipv6").innerHTML = "None";
-                    });
-                    req_addr_v6.open(
-                        "GET",
-                        "https://ip.v6.${domain}:8444/?type=json",
-                    );
-                    req_addr_v6.send();
-                }
-
-                var resolver_ip_list = [];
-                function check_dns_finished(url) {
-                    var req_check_dns_result = new XMLHttpRequest();
-                    req_check_dns_result.addEventListener("load", function (r) {
-                        if (
-                            req_check_dns_result.status != 200 ||
-                            req_check_dns_result.responseText == ""
-                        ) {
-                            return;
-                        }
-
-                        var dns_data = JSON.parse(
-                            req_check_dns_result.responseText,
-                        );
-                        var dns_list = dns_data["resolvers"];
-                        var index =
-                            document.getElementsByClassName("resolver").length +
-                            1;
-                        var dns_node = document.getElementById("dns");
-                        var latency_element =
-                            document.getElementById("dns-latency");
-                        var latency_span = latency_element.children[0];
-                        dns_list.forEach(function (dns) {
-                            var new_dns_node = dns_node.cloneNode(true);
-                            new_dns_node.removeAttribute("id");
-                            new_dns_node.removeAttribute("style");
-                            new_dns_node.setAttribute("class", "resolver");
-                            var ip = dns["resolver_ip"];
-                            if (resolver_ip_list.includes(ip)) {
-                                return;
-                            }
-                            resolver_ip_list.push(ip);
-                            new_dns_node.children[0].textContent =
-                                "DNS" + index + ": ";
-                            if (ip.indexOf(":") != -1) {
-                                new_dns_node.children[1].innerHTML =
-                                    '<span class="ipv6">' + ip + "</span>";
-                            } else {
-                                new_dns_node.children[1].innerHTML =
-                                    '<span class="ipv4">' + ip + "</span>";
-                            }
-                            new_dns_node.children[1].setAttribute(
-                                "href",
-                                "https://bgp.tools/prefix/" + ip,
-                            );
-                            if (dns["asn"] != null) {
-                                new_dns_node.children[2].textContent =
+                                var ipv4_addr = dns_data["ip"];
+                                document
+                                    .getElementById("ipv4")
+                                    .setAttribute(
+                                        "href",
+                                        "https://bgp.tools/prefix/" + ipv4_addr,
+                                    );
+                                document.getElementById("ipv4").innerHTML =
+                                    '<span class="ipv4">' +
+                                    ipv4_addr +
+                                    "</span>";
+                                document.getElementById(
+                                    "ipv4",
+                                ).nextSibling.textContent =
                                     "AS: " +
-                                    dns["asn"]["number"] +
+                                    dns_data["number"] +
                                     ", " +
-                                    dns["asn"]["description"] +
+                                    dns_data["description"] +
                                     ", " +
-                                    dns["asn"]["country"];
+                                    dns_data["country"];
+                            } else {
+                                document.getElementById("ipv4").innerHTML =
+                                    "None";
                             }
-                            if (dns["edns_enabled"]) {
-                                new_dns_node.children[3].textContent =
-                                    "ECS: " + dns["edns_subnet"];
-                            }
-                            if (dns["is_tcp_request"]) {
-                                new_dns_node.children[4].textContent =
-                                    "TCP Request";
-                            }
-                            dns_node.parentNode.insertBefore(
-                                new_dns_node,
-                                latency_element,
-                            );
-                            index++;
                         });
-                        dns_node.setAttribute("style", "display: none;");
-                        if (latency_span.textContent == "") {
-                            latency_span.textContent =
-                                dns_data["latency"] + "ms";
-                            latency_span.removeAttribute("style");
-                        }
-                    });
-                    req_check_dns_result.open("GET", url);
-                    req_check_dns_result.send();
-                }
+                        req_addr_v4.addEventListener("error", function (r) {
+                            document.getElementById("ipv4").innerHTML = "None";
+                        });
+                        req_addr_v4.addEventListener("timeout", function (r) {
+                            document.getElementById("ipv4").innerHTML = "None";
+                        });
+                        req_addr_v4.open(
+                            "GET",
+                            "https://ip.v4.${domain}:8444/?type=json",
+                        );
+                        req_addr_v4.send();
 
-                function do_dns_request(url1, url2, on_finish) {
-                    var req_dns1 = new XMLHttpRequest();
-                    req_dns1.timeout = 10000;
-                    req_dns1.addEventListener("load", function (r) {
-                        if (req_dns1.status != 200) {
-                            on_finish(-1);
-                            return;
-                        }
+                        var req_addr_v6 = new XMLHttpRequest();
+                        req_addr_v6.timeout = 10000;
+                        req_addr_v6.addEventListener("load", function (r) {
+                            if (req_addr_v6.status == 200) {
+                                var dns_data = JSON.parse(
+                                    req_addr_v6.responseText,
+                                );
+                                var ipv6_addr = dns_data["ip"];
+                                document
+                                    .getElementById("ipv6")
+                                    .setAttribute(
+                                        "href",
+                                        "https://bgp.tools/prefix/" + ipv6_addr,
+                                    );
+                                document.getElementById("ipv6").innerHTML =
+                                    '<span class="ipv6">' +
+                                    ipv6_addr +
+                                    "</span>";
+                                document.getElementById(
+                                    "ipv6",
+                                ).nextSibling.textContent =
+                                    "AS: " +
+                                    dns_data["number"] +
+                                    ", " +
+                                    dns_data["description"] +
+                                    ", " +
+                                    dns_data["country"];
+                            } else {
+                                document.getElementById("ipv6").innerHTML =
+                                    "None";
+                            }
+                        });
+                        req_addr_v6.addEventListener("error", function (r) {
+                            document.getElementById("ipv6").innerHTML = "None";
+                        });
+                        req_addr_v6.addEventListener("timeout", function (r) {
+                            document.getElementById("ipv6").innerHTML = "None";
+                        });
+                        req_addr_v6.open(
+                            "GET",
+                            "https://ip.v6.${domain}:8444/?type=json",
+                        );
+                        req_addr_v6.send();
+                    }
 
-                        var req_dns2 = new XMLHttpRequest();
-                        req_dns2.timeout = 10000;
-                        req_dns2.addEventListener("load", function (r) {
-                            if (req_dns2.status != 200) {
+                    var resolver_ip_list = [];
+                    function check_dns_finished(url) {
+                        var req_check_dns_result = new XMLHttpRequest();
+                        req_check_dns_result.addEventListener(
+                            "load",
+                            function (r) {
+                                if (
+                                    req_check_dns_result.status != 200 ||
+                                    req_check_dns_result.responseText == ""
+                                ) {
+                                    return;
+                                }
+
+                                var dns_data = JSON.parse(
+                                    req_check_dns_result.responseText,
+                                );
+                                var dns_list = dns_data["resolvers"];
+                                var index =
+                                    document.getElementsByClassName("resolver")
+                                        .length + 1;
+                                var dns_node = document.getElementById("dns");
+                                var latency_element =
+                                    document.getElementById("dns-latency");
+                                var latency_span = latency_element.children[0];
+                                dns_list.forEach(function (dns) {
+                                    var new_dns_node = dns_node.cloneNode(true);
+                                    new_dns_node.removeAttribute("id");
+                                    new_dns_node.removeAttribute("style");
+                                    new_dns_node.setAttribute(
+                                        "class",
+                                        "resolver",
+                                    );
+                                    var ip = dns["resolver_ip"];
+                                    if (resolver_ip_list.includes(ip)) {
+                                        return;
+                                    }
+                                    resolver_ip_list.push(ip);
+                                    new_dns_node.children[0].textContent =
+                                        "DNS" + index + ": ";
+                                    if (ip.indexOf(":") != -1) {
+                                        new_dns_node.children[1].innerHTML =
+                                            '<span class="ipv6">' +
+                                            ip +
+                                            "</span>";
+                                    } else {
+                                        new_dns_node.children[1].innerHTML =
+                                            '<span class="ipv4">' +
+                                            ip +
+                                            "</span>";
+                                    }
+                                    new_dns_node.children[1].setAttribute(
+                                        "href",
+                                        "https://bgp.tools/prefix/" + ip,
+                                    );
+                                    if (dns["asn"] != null) {
+                                        new_dns_node.children[2].textContent =
+                                            "AS: " +
+                                            dns["asn"]["number"] +
+                                            ", " +
+                                            dns["asn"]["description"] +
+                                            ", " +
+                                            dns["asn"]["country"];
+                                    }
+                                    if (dns["edns_enabled"]) {
+                                        new_dns_node.children[3].textContent =
+                                            "ECS: " + dns["edns_subnet"];
+                                    }
+                                    if (dns["is_tcp_request"]) {
+                                        new_dns_node.children[4].textContent =
+                                            "TCP Request";
+                                    }
+                                    dns_node.parentNode.insertBefore(
+                                        new_dns_node,
+                                        latency_element,
+                                    );
+                                    index++;
+                                });
+                                dns_node.setAttribute(
+                                    "style",
+                                    "display: none;",
+                                );
+                                if (latency_span.textContent == "") {
+                                    latency_span.textContent =
+                                        dns_data["latency"] + "ms";
+                                    latency_span.removeAttribute("style");
+                                }
+                            },
+                        );
+                        req_check_dns_result.open("GET", url);
+                        req_check_dns_result.send();
+                    }
+
+                    function do_dns_request(url1, url2, on_finish) {
+                        var req_dns1 = new XMLHttpRequest();
+                        req_dns1.timeout = 10000;
+                        req_dns1.addEventListener("load", function (r) {
+                            if (req_dns1.status != 200) {
                                 on_finish(-1);
                                 return;
                             }
 
-                            on_finish(0);
-                        });
-                        req_dns2.addEventListener("error", function (r) {
-                            on_finish(-1);
-                        });
-                        req_dns2.addEventListener("timeout", function (r) {
-                            on_finish(-1);
-                        });
-                        req_dns2.open("GET", url2);
-                        req_dns2.send();
-                    });
-                    req_dns1.addEventListener("error", function (r) {
-                        on_finish(-1);
-                    });
-                    req_dns1.addEventListener("timeout", function (r) {
-                        on_finish(-1);
-                    });
-                    req_dns1.open("GET", url1);
-                    req_dns1.send();
-                }
+                            var req_dns2 = new XMLHttpRequest();
+                            req_dns2.timeout = 10000;
+                            req_dns2.addEventListener("load", function (r) {
+                                if (req_dns2.status != 200) {
+                                    on_finish(-1);
+                                    return;
+                                }
 
-                get_ip_info();
-                do_dns_request(
-                    "https://${1}.v4.${domain}:8444/?t=t2",
-                    "https://${1}.v4.${domain}:8443/?t=t3",
-                    function (d) {
-                        if (d != 0) {
-                            return;
-                        }
-                        check_dns_finished(
-                            "https://${1}.v4.${domain}:8443/?t=t4",
-                        );
-                    },
-                );
-                do_dns_request(
-                    "https://${2}.v6.${domain}:8444/?t=t2",
-                    "https://${2}.v6.${domain}:8443/?t=t3",
-                    function (d) {
-                        if (d != 0) {
-                            return;
-                        }
-                        check_dns_finished(
-                            "https://${2}.v6.${domain}:8443/?t=t4",
-                        );
-                    },
-                );
-            })();
-        </script>
+                                on_finish(0);
+                            });
+                            req_dns2.addEventListener("error", function (r) {
+                                on_finish(-1);
+                            });
+                            req_dns2.addEventListener("timeout", function (r) {
+                                on_finish(-1);
+                            });
+                            req_dns2.open("GET", url2);
+                            req_dns2.send();
+                        });
+                        req_dns1.addEventListener("error", function (r) {
+                            on_finish(-1);
+                        });
+                        req_dns1.addEventListener("timeout", function (r) {
+                            on_finish(-1);
+                        });
+                        req_dns1.open("GET", url1);
+                        req_dns1.send();
+                    }
+
+                    get_ip_info();
+                    do_dns_request(
+                        "https://${1}.v4.${domain}:8444/?t=t2",
+                        "https://${1}.v4.${domain}:8443/?t=t3",
+                        function (d) {
+                            if (d != 0) {
+                                return;
+                            }
+                            check_dns_finished(
+                                "https://${1}.v4.${domain}:8443/?t=t4",
+                            );
+                        },
+                    );
+                    do_dns_request(
+                        "https://${2}.v6.${domain}:8444/?t=t2",
+                        "https://${2}.v6.${domain}:8443/?t=t3",
+                        function (d) {
+                            if (d != 0) {
+                                return;
+                            }
+                            check_dns_finished(
+                                "https://${2}.v6.${domain}:8443/?t=t4",
+                            );
+                        },
+                    );
+                })();
+            </script>
+        </main>
+        <footer>
+            <p>
+                Source code available on
+                <a href="https://github.com/zaczh/dns_probe" target="_blank"
+                    >GitHub</a
+                >.
+            </p>
+        </footer>
     </body>
 </html>
