@@ -38,12 +38,19 @@
                 min-height: 100dvh;
             }
 
+            ul.list {
+                padding-inline-start: 20px;
+            }
+
             main {
+                padding-left: 20px;
+                padding-right: 20px;
                 flex: 1;
             }
 
             footer {
-                width: 100%;
+                padding-left: 20px;
+                padding-right: 20px;
                 font-size: small;
                 text-align: end;
                 position: relative;
@@ -85,7 +92,7 @@
 
     <body>
         <main>
-            <ul>
+            <ul class="list">
                 <li>IPv4: <a id="ipv4"></a><span class="additional"></span></li>
                 <li>IPv6: <a id="ipv6"></a><span class="additional"></span></li>
                 <li id="dns">
