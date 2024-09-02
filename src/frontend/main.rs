@@ -592,6 +592,24 @@ fn ip_dns_check_handler_main(addr: SocketAddr, req: Request<()>) -> Response<Vec
     }
 
     if !is_result_request {
+        response.headers_mut().insert(
+            http::header::CONTENT_TYPE,
+            HeaderValue::from_static("application/json"),
+        );
+        let response_str = if let Some(asn) = ASN_HANDLE.lookup_by_ip(addr.ip()) {
+            format!(
+                    "{{\"ip\": \"{}\",\"number\": \"{}\", \"country\": \"{}\", \"description\": \"{}\"}}",
+                    addr.ip().to_string(),
+                    asn.number,
+                    asn.country,
+                    asn.description
+                )
+        } else {
+            format!("{{\"ip\": \"{}\"}}", addr.ip().to_string())
+        };
+
+        let mut body_bytes = Vec::from(response_str);
+        response.body_mut().append(&mut body_bytes);
         return response;
     }
 

@@ -102,9 +102,7 @@
             <script type="text/javascript">
                 "use strict";
                 (function () {
-                    function get_ip_info() {
-                        var req_addr_v4 = new XMLHttpRequest();
-                        req_addr_v4.timeout = 10000;
+                    function get_ip_info_v4(req_addr_v4) {
                         req_addr_v4.addEventListener("load", function (r) {
                             if (req_addr_v4.status == 200) {
                                 var dns_data = JSON.parse(
@@ -141,14 +139,9 @@
                         req_addr_v4.addEventListener("timeout", function (r) {
                             document.getElementById("ipv4").innerHTML = "None";
                         });
-                        req_addr_v4.open(
-                            "GET",
-                            "https://ip.v4.${domain}:8444/?type=json",
-                        );
-                        req_addr_v4.send();
+                    }
 
-                        var req_addr_v6 = new XMLHttpRequest();
-                        req_addr_v6.timeout = 10000;
+                    function get_ip_info_v6(req_addr_v6) {
                         req_addr_v6.addEventListener("load", function (r) {
                             if (req_addr_v6.status == 200) {
                                 var dns_data = JSON.parse(
@@ -185,11 +178,6 @@
                         req_addr_v6.addEventListener("timeout", function (r) {
                             document.getElementById("ipv6").innerHTML = "None";
                         });
-                        req_addr_v6.open(
-                            "GET",
-                            "https://ip.v6.${domain}:8444/?type=json",
-                        );
-                        req_addr_v6.send();
                     }
 
                     var resolver_ip_list = [];
@@ -284,9 +272,15 @@
                         req_check_dns_result.send();
                     }
 
-                    function do_dns_request(url1, url2, on_finish) {
+                    function do_dns_request(
+                        url1,
+                        url2,
+                        on_request_created,
+                        on_finish,
+                    ) {
                         var req_dns1 = new XMLHttpRequest();
                         req_dns1.timeout = 10000;
+                        on_request_created(req_dns1);
                         req_dns1.addEventListener("load", function (r) {
                             if (req_dns1.status != 200) {
                                 on_finish(-1);
@@ -322,10 +316,12 @@
                         req_dns1.send();
                     }
 
-                    get_ip_info();
                     do_dns_request(
                         "https://${1}.v4.${domain}:8444/?t=t2",
                         "https://${1}.v4.${domain}:8443/?t=t3",
+                        function (req) {
+                            get_ip_info_v4(req);
+                        },
                         function (d) {
                             if (d != 0) {
                                 return;
@@ -338,6 +334,9 @@
                     do_dns_request(
                         "https://${2}.v6.${domain}:8444/?t=t2",
                         "https://${2}.v6.${domain}:8443/?t=t3",
+                        function (req) {
+                            get_ip_info_v6(req);
+                        },
                         function (d) {
                             if (d != 0) {
                                 return;
