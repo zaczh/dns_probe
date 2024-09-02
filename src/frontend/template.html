@@ -109,7 +109,7 @@
             <script type="text/javascript">
                 "use strict";
                 (function () {
-                    function get_ip_info_v4(req_addr_v4, tag_id) {
+                    function get_ip_info(req_addr_v4, tag_id) {
                         req_addr_v4.addEventListener("load", function (r) {
                             if (req_addr_v4.status == 200) {
                                 var dns_data = JSON.parse(
@@ -290,7 +290,7 @@
                         "https://${1}.v4.${domain}:8444/?t=t2",
                         "https://${1}.v4.${domain}:8443/?t=t3",
                         function (req) {
-                            get_ip_info_v4(req, "ipv4");
+                            get_ip_info(req, "ipv4");
                         },
                         function (d) {
                             if (d != 0) {
@@ -305,7 +305,7 @@
                         "https://${2}.v6.${domain}:8444/?t=t2",
                         "https://${2}.v6.${domain}:8443/?t=t3",
                         function (req) {
-                            get_ip_info_v4(req, "ipv6");
+                            get_ip_info(req, "ipv6");
                         },
                         function (d) {
                             if (d != 0) {
