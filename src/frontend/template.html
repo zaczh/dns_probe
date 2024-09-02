@@ -109,12 +109,10 @@
             <script type="text/javascript">
                 "use strict";
                 (function () {
-                    function get_ip_info(req_addr_v4, tag_id) {
-                        req_addr_v4.addEventListener("load", function (r) {
-                            if (req_addr_v4.status == 200) {
-                                var dns_data = JSON.parse(
-                                    req_addr_v4.responseText,
-                                );
+                    function get_ip_info(req, tag_id) {
+                        req.addEventListener("load", function (r) {
+                            if (req.status == 200) {
+                                var dns_data = JSON.parse(req.responseText);
                                 var ipv4_addr = dns_data["ip"];
                                 document
                                     .getElementById(tag_id)
@@ -142,10 +140,10 @@
                                     "None";
                             }
                         });
-                        req_addr_v4.addEventListener("error", function (r) {
+                        req.addEventListener("error", function (r) {
                             document.getElementById(tag_id).innerHTML = "None";
                         });
-                        req_addr_v4.addEventListener("timeout", function (r) {
+                        req.addEventListener("timeout", function (r) {
                             document.getElementById(tag_id).innerHTML = "None";
                         });
                     }
