@@ -1,4 +1,12 @@
 # Changelog
+
+## v0.1.3 (9/3/2024)
+
+### Fixed
+
+- Reuse probe HTTP requests to show IP addresses.
+- Bump versions.
+
 ## v0.1.2 (8/19/2024)
 
 ### Fixed
